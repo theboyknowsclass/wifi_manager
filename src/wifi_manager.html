@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wifi Manager</title>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            #content {
+                margin: auto;
+                padding: 10px;
+                width: fit-content;
+            }
+
+            #loading {
+                background-color: #cccccccc;
+                position: absolute;
+                top:0;
+                left:0;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                visibility: visible;
+            }
+
+            #loading_content {
+                background: #FFFFFF;
+                border: #505050;
+                border-style: solid;
+                border-width: 0.2rem;
+                position: absolute;
+                padding: 15% 25%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                border-radius: 1rem;
+            }
+
+            #wifi_settings {
+                border: #505050;
+                border-style: solid;
+                border-width: 0.1rem;
+                position: absolute;
+                border-radius: 1rem;
+                padding: 1rem;
+                height: fit-content;
+            }
+
+            #wifi_settings_title {
+                background-color: white;
+                padding: 0px;
+                margin: 0px;
+                position: relative;
+                top: -1.5rem;
+                width: fit-content;
+            }
+
+            #wifi_networks {
+                display: flex;
+                flex-direction: row;
+                margin-bottom: 0.2rem;
+            }
+
+            #wifi_password {
+                display: flex;
+                flex-direction: row;
+            }
+
+            #ssid_dropdown {
+                height: 1.4rem;
+                flex-grow: 1;
+                margin-right: 0.2rem;
+            }
+
+            #refresh, #connect {
+                height: 1.4rem;
+                min-width: 4.1rem;
+            }
+
+            #password {
+                height: 1.2rem;
+                flex-grow: 1;
+                padding: 0px;
+            }
+
+            h1 {
+                color: #505050;
+                font-size:1.4rem
+            }
+
+            h2 {
+                color: #606060;
+                font-size:1.2rem
+            }
+
+            h3 {
+                color: #606060;
+                font-size:1rem
+            }
+
+
+        </style>
+        <script type="text/javascript">
+            var ipAddress = "{ip_address}"
+
+            async function getNetworks() {
+                var sel = document.getElementById('ssid_dropdown') // find the drop down
+                const response = await fetch(`http://${ipAddress}/wifi_settings/networks`)
+                const networks = await response.json()
+                networks.forEach(ssid => 
+                    {
+                        var opt = document.createElement("option"); // Create the new element
+                        opt.value = ssid; // set the value
+                        opt.text = ssid; // set the text
+                        sel.appendChild(opt)
+                    }
+                );
+            }
+
+            async function getMode() {
+                var sel = document.getElementById('wifi_mode')
+                const response = await fetch(`http://${ipAddress}/wifi_settings/mode`)
+                const data = await response.json()
+                console.log(data)
+                sel.innerHTML = `Mode: ${data.mode}`
+            }
+
+            async function getSsid() {
+                var sel = document.getElementById('wifi_ssid')
+                var ssidDropdown = document.getElementById('ssid_dropdown')
+                const response = await fetch(`http://${ipAddress}/wifi_settings/current`)
+                const data = await response.json()
+                sel.innerHTML = `SSID: ${data.ssid}`
+                ssidDropdown.value = data.ssid
+            }
+
+            function refreshNetworks() {
+                var sel = document.getElementById('ssid_dropdown')
+                while (sel.options.length > 0) {                
+                    sel.remove(0);
+                }
+                getNetworks()
+            }
+
+            function showLoading() {
+                const element = document.getElementById("loading");
+                element.style.visibility = "visible";
+            }
+
+            function hideLoading() {
+                const element = document.getElementById("loading");	
+                element.style.visibility = "hidden";
+            }
+
+            async function onLoad() {
+                showLoading()
+                await getMode()
+                await getNetworks()
+                await getSsid()
+                hideLoading()
+            }
+        </script>
+    </head>
+    <body onLoad="onLoad()">
+        <div id="loading">
+            <h3 id="loading_content">
+                Loading...
+            </h3>
+        </div>
+        <div id="content">
+            <h1 id="wifi_manager_title">Wifi Manager</h1>
+
+            <h2 id="wifi_mode">Mode:</h2>
+            <h2 id="wifi_ssid">SSID:</h2>
+            <h3 id="wifi_status">Status</h3>
+
+            <form action="/wifi_settings/connect" method="post">
+                <div id="wifi_settings">
+                    <div id="wifi_settings_title">Wifi Settings</div>
+                    <div id="wifi_networks">
+                        <select id="ssid_dropdown" name="ssid"></select>
+                        <button id="refresh" onclick="refreshNetworks()">Refresh</button>
+                    </div>
+                    <div if="wifi_password">
+                        <label id="password_label" for="password">Password: </label>
+                        <input type="password" name="password" id="password" required>
+                        <input id="connect" type="submit" value="Connect">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

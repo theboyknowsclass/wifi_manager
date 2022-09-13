@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-adafruit_httpserver
+adafruit-circuitpython-httpserver
 ipaddress
 socketpool
 wifi

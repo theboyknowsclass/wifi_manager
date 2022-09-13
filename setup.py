@@ -40,7 +40,7 @@ setup(
     author="Gautam Bhatnagar",
     author_email="",  # TODO: Add your email here
     install_requires=[
-        "adafruit_httpserver",
+        "adafruit-circuitpython-httpserver",
         "ipaddress",
         "socketpool",
         "wifi",

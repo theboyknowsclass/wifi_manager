@@ -40,11 +40,12 @@ setup(
     author="Gautam Bhatnagar",
     author_email="",  # TODO: Add your email here
     install_requires=[
-        "Adafruit-Blinka",
-        "adafruit-httpserver",
+        "adafruit_httpserver",
         "ipaddress",
         "socketpool",
         "wifi",
+        "json",
+        "time",
     ],
     # Choose your license
     license="MIT",

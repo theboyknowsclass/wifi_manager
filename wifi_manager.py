@@ -1,4 +1,3 @@
-# SPDX-FileCopyrightText: 2017 Scott Shawcroft, written for Adafruit Industries
 # SPDX-FileCopyrightText: Copyright (c) 2022 Gautam Bhatnagar for n/a
 #
 # SPDX-License-Identifier: MIT
@@ -6,7 +5,7 @@
 `wifi_manager`
 ================================================================================
 
-Circuitpython helper library for managing wifi for iot devices
+Circuit python helper library for managing wifi for iot devices
 
 
 * Author(s): Gautam Bhatnagar
@@ -128,7 +127,7 @@ class WifiManager:
         self.create_server()
 
     def stop_ap(self):
-        self.ip_address is None
+        self.ip_address = None
         wifi.radio.stop_ap()
         wifi.radio.stop_station()
 
@@ -370,9 +369,12 @@ class WifiManager:
         print(ssid)
         print(password)
         result = self.connect_to_wifi(ssid, password)
-        networks = json.dumps(self.get_wifi_networks())
+        return_status = json.dumps({
+            "status":"failure" if result is None else "success",
+            "ip":f"{result}"
+        })
 
-        return HTTPResponse(body="connect")
+        return HTTPResponse(body=f"{str(return_status)}")
 
     def add_server_routes(self):
         self.add_server_route("/wifi_settings", "GET", self.get_configuration_page)

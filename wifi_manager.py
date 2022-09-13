@@ -406,17 +406,14 @@ class WifiManager:
         if self.server is not None:
             self.server.routes[_HTTPRequest(path, method)] = func
 
-    # noinspection PyUnusedLocal - needed for http response
     def get_wifi_networks_response(self, request):
         networks = json.dumps(self.get_wifi_networks())
         return HTTPResponse(body=f"{str(networks)}")
 
-    # noinspection PyUnusedLocal - needed for http response
     def get_wifi_mode_response(self, request):
         mode = json.dumps({"mode": self.status})
         return HTTPResponse(body=f"{str(mode)}")
 
-    # noinspection PyUnusedLocal - needed for http response
     def get_wifi_current_response(self, request):
         current_ssid = (
             self.selected_wifi["ssid"]

@@ -7,5 +7,3 @@ adafruit-circuitpython-httpserver
 ipaddress
 socketpool
 wifi
-json
-time

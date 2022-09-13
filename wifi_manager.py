@@ -30,12 +30,12 @@ Implementation Notes
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/theboyknowsclass/CircuitPython_wifi_manager.git"
 
-import wifi
-import json
-import socketpool
-import ipaddress
-from adafruit_httpserver import HTTPServer, HTTPResponse, _HTTPRequest
 import time
+import json
+import ipaddress
+import wifi
+import socketpool
+from adafruit_httpserver import HTTPServer, HTTPResponse, _HTTPRequest
 
 
 class WifiManager:

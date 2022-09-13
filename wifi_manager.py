@@ -44,7 +44,7 @@ class WifiManager:
     PING_FAIL_LIMIT = 4
 
     def __init__(self, ap_name):
-        self.settings_filename = f'{ap_name}_wifi_settings'
+        self.settings_filename = f"{ap_name}_wifi_settings"
         self.ip_address = None
         self.status = "ACCESS_POINT"
         self.selected_wifi = None
@@ -57,10 +57,15 @@ class WifiManager:
 
     def initialise(self):
         self.selected_wifi = self.load_settings()
-        if (self.selected_wifi is not None
-                and "ssid" in self.selected_wifi
-                and "password" in self.selected_wifi
-                and self.connect_to_wifi(self.selected_wifi["ssid"], self.selected_wifi["password"]) is not None):
+        if (
+            self.selected_wifi is not None
+            and "ssid" in self.selected_wifi
+            and "password" in self.selected_wifi
+            and self.connect_to_wifi(
+                self.selected_wifi["ssid"], self.selected_wifi["password"]
+            )
+            is not None
+        ):
             return
 
         self.create_ap()
@@ -70,12 +75,12 @@ class WifiManager:
         if self.server is not None:
             self.server.poll()
 
-        if (self.status == "CLIENT"
-                and now > self.last_poll_time + self.PING_POLL):
+        if self.status == "CLIENT" and now > self.last_poll_time + self.PING_POLL:
             ping_time = wifi.radio.ping(ipaddress.ip_address(self.PING_IP))
-            self.ping_status = {"status": "Failed" if ping_time is None else "Success",
-                                "time": "None" if ping_time is None else ping_time,
-                                }
+            self.ping_status = {
+                "status": "Failed" if ping_time is None else "Success",
+                "time": "None" if ping_time is None else ping_time,
+            }
             if ping_time is None:
                 self.ping_fail_count = self.ping_fail_count + 1
             else:
@@ -85,7 +90,9 @@ class WifiManager:
 
             if self.ping_fail_count >= self.PING_FAIL_LIMIT:
                 self.create_ap()
-                self.connect_to_wifi(self.selected_wifi["ssid"], self.selected_wifi["password"])
+                self.connect_to_wifi(
+                    self.selected_wifi["ssid"], self.selected_wifi["password"]
+                )
 
     @staticmethod
     def get_wifi_networks():
@@ -110,7 +117,7 @@ class WifiManager:
                 self.create_server()
                 return self.ip_address
             else:
-                print(f'{ssid} not available')
+                print(f"{ssid} not available")
                 return None
         except BaseException as err:
             print(f"Unexpected {err=}, {type(err)=} connecting to {ssid}")
@@ -148,7 +155,9 @@ class WifiManager:
                 jsonfile.close()
             return data
         except BaseException as err:
-            print(f"Unexpected {err=}, {type(err)=} loading settings from to {self.settings_filename}")
+            print(
+                f"Unexpected {err=}, {type(err)=} loading settings from to {self.settings_filename}"
+            )
             return None
 
     def create_server(self):
@@ -159,7 +168,8 @@ class WifiManager:
             self.server.start(str(self.ip_address))
 
     def get_configuration_page(self, request):
-        configPage = '''<!DOCTYPE html>
+        configPage = (
+            '''<!DOCTYPE html>
 <html>
     <head>
         <title>Wifi Manager</title>
@@ -263,7 +273,9 @@ class WifiManager:
 
         </style>
         <script type="text/javascript">
-            var ipAddress = "''' + self.ip_address + '''"
+            var ipAddress = "'''
+            + self.ip_address
+            + """"
 
             async function getNetworks() {
                 var sel = document.getElementById('ssid_dropdown') // find the drop down
@@ -352,36 +364,43 @@ class WifiManager:
             </form>
         </div>
     </body>
-</html>'''
+</html>"""
+        )
         return HTTPResponse(body=configPage, content_type="text/html")
 
     def get_ssid(self):
         if self.status == "ACCESS_POINT":
             return self.ap_name
-        if (self.selected_wifi is not None and
-                "ssid" in self.selected_wifi):
+        if self.selected_wifi is not None and "ssid" in self.selected_wifi:
             return self.selected_wifi["ssid"]
 
     def connect_to_wifi_network(self, request):
-        parameters = request.raw_request.decode("utf-8").splitlines()[-1].split("&password=")
+        parameters = (
+            request.raw_request.decode("utf-8").splitlines()[-1].split("&password=")
+        )
         ssid = parameters[0].replace("ssid=", "")
         password = parameters[1]
         print(ssid)
         print(password)
         result = self.connect_to_wifi(ssid, password)
-        return_status = json.dumps({
-            "status":"failure" if result is None else "success",
-            "ip":f"{result}"
-        })
+        return_status = json.dumps(
+            {"status": "failure" if result is None else "success", "ip": f"{result}"}
+        )
 
         return HTTPResponse(body=f"{str(return_status)}")
 
     def add_server_routes(self):
         self.add_server_route("/wifi_settings", "GET", self.get_configuration_page)
         self.add_server_route("/wifi_settings/mode", "GET", self.get_wifi_mode_response)
-        self.add_server_route("/wifi_settings/current", "GET", self.get_wifi_current_response)
-        self.add_server_route("/wifi_settings/networks", "GET", self.get_wifi_networks_response)
-        self.add_server_route("/wifi_settings/connect", "POST", self.connect_to_wifi_network)
+        self.add_server_route(
+            "/wifi_settings/current", "GET", self.get_wifi_current_response
+        )
+        self.add_server_route(
+            "/wifi_settings/networks", "GET", self.get_wifi_networks_response
+        )
+        self.add_server_route(
+            "/wifi_settings/connect", "POST", self.connect_to_wifi_network
+        )
 
     def add_server_route(self, path, method, func):
         if self.server is not None:
@@ -399,7 +418,10 @@ class WifiManager:
 
     # noinspection PyUnusedLocal - needed for http response
     def get_wifi_current_response(self, request):
-        current_ssid = self.selected_wifi["ssid"] if (
-                    self.selected_wifi is not None and "ssid" in self.selected_wifi) else "None"
+        current_ssid = (
+            self.selected_wifi["ssid"]
+            if (self.selected_wifi is not None and "ssid" in self.selected_wifi)
+            else "None"
+        )
         current = json.dumps({"ssid": current_ssid})
         return HTTPResponse(body=f"{str(current)}")

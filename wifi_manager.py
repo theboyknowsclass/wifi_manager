@@ -1,3 +1,36 @@
+# SPDX-FileCopyrightText: 2017 Scott Shawcroft, written for Adafruit Industries
+# SPDX-FileCopyrightText: Copyright (c) 2022 Gautam Bhatnagar for n/a
+#
+# SPDX-License-Identifier: MIT
+"""
+`wifi_manager`
+================================================================================
+
+Circuitpython helper library for managing wifi for iot devices
+
+
+* Author(s): Gautam Bhatnagar
+
+Implementation Notes
+--------------------
+
+**Hardware:**
+
+.. todo:: Add links to any specific hardware product page(s), or category page(s).
+  Use unordered list & hyperlink rST inline format: "* `Link Text <url>`_"
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the supported boards:
+  https://circuitpython.org/downloads
+
+"""
+
+# imports
+
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/theboyknowsclass/CircuitPython_wifi_manager.git"
+
 import wifi
 import json
 import socketpool

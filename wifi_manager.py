@@ -122,9 +122,8 @@ class WifiManager:
                 self.status = "CLIENT"
                 self.create_server()
                 return self.ip_address
-            else:
-                print(f"{ssid} not available")
-                return None
+            print(f"{ssid} not available")
+            return None
         except BaseException as err:
             print(f"Unexpected {err=}, {type(err)=} connecting to {ssid}")
             return None
@@ -178,9 +177,9 @@ class WifiManager:
         if self.ip_address is not None:
             self.server.start(str(self.ip_address))
 
-    def get_configuration_page(self, request):
+    def get_configuration_page(self, _request):
         """Returns the html configuration page."""
-        configPage = (
+        config_page = (
             '''<!DOCTYPE html>
 <html>
     <head>
@@ -378,7 +377,7 @@ class WifiManager:
     </body>
 </html>"""
         )
-        return HTTPResponse(body=configPage, content_type="text/html")
+        return HTTPResponse(body=config_page, content_type="text/html")
 
     def get_ssid(self):
         """Get the current SSID that the device is connected to or the AP Name"""
@@ -386,6 +385,7 @@ class WifiManager:
             return self.ap_name
         if self.selected_wifi is not None and "ssid" in self.selected_wifi:
             return self.selected_wifi["ssid"]
+        return "ERROR"
 
     def connect_to_wifi_network(self, request):
         """Get the current SSID that the device is connected to or the AP Name"""
@@ -422,17 +422,17 @@ class WifiManager:
         if self.server is not None:
             self.server.routes[_HTTPRequest(path, method)] = func
 
-    def get_wifi_networks_response(self, request):
+    def get_wifi_networks_response(self, _request):
         """Wrapper function for get_wifi_networks"""
         networks = json.dumps(self.get_wifi_networks())
         return HTTPResponse(body=f"{str(networks)}")
 
-    def get_wifi_mode_response(self, request):
+    def get_wifi_mode_response(self, _request):
         """Wrapper function for get_wifi_mode"""
         mode = json.dumps({"mode": self.status})
         return HTTPResponse(body=f"{str(mode)}")
 
-    def get_wifi_current_response(self, request):
+    def get_wifi_current_response(self, _request):
         """Wrapper function for get_wifi_current"""
         current_ssid = (
             self.selected_wifi["ssid"]

@@ -39,6 +39,8 @@ from adafruit_httpserver import HTTPServer, HTTPResponse, _HTTPRequest
 
 
 class WifiManager:
+    """The Wifi Manager class - needs to be initialised."""
+
     PING_POLL = 15
     PING_IP = "8.8.8.8"
     PING_FAIL_LIMIT = 4
@@ -56,6 +58,7 @@ class WifiManager:
         self.ping_fail_count = 0
 
     def initialise(self):
+        """If a Wifi network has been previously set, connect to it, else inter AP mode."""
         self.selected_wifi = self.load_settings()
         if (
             self.selected_wifi is not None
@@ -71,6 +74,7 @@ class WifiManager:
         self.create_ap()
 
     def poll(self):
+        """Process any actions - this should be in the main loop (with no time.sleep)"""
         now = time.monotonic()
         if self.server is not None:
             self.server.poll()

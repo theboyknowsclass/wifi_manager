@@ -100,6 +100,7 @@ class WifiManager:
 
     @staticmethod
     def get_wifi_networks():
+        """Returns a list of the available SSIDs."""
         networks = []
         for network in wifi.radio.start_scanning_networks():
             networks.append(network.ssid)
@@ -108,6 +109,7 @@ class WifiManager:
         return networks
 
     def connect_to_wifi(self, ssid, password):
+        """Connect to a specified wifi network, and return the assigned IP address if successful"""
         try:
             if ssid in self.get_wifi_networks():
                 self.server = None
@@ -128,6 +130,7 @@ class WifiManager:
             return None
 
     def create_ap(self):
+        """Start the device in AP mode"""
         if self.status == "CLIENT":
             self.stop_ap()
         wifi.radio.start_ap(self.ap_name)
@@ -138,11 +141,13 @@ class WifiManager:
         self.create_server()
 
     def stop_ap(self):
+        """Stop AP mode"""
         self.ip_address = None
         wifi.radio.stop_ap()
         wifi.radio.stop_station()
 
     def save_settings(self, ssid, password):
+        """Set the default SSID and password to connect to"""
         network_info = {
             "ssid": ssid,
             "password": password,
@@ -153,6 +158,7 @@ class WifiManager:
             jsonfile.close()
 
     def load_settings(self):
+        """Returns the saved settings"""
         try:
             with open(self.settings_filename, "r") as jsonfile:
                 data = json.load(jsonfile)
@@ -165,6 +171,7 @@ class WifiManager:
             return None
 
     def create_server(self):
+        """Creates the server and adds the http routes"""
         self.pool = socketpool.SocketPool(wifi.radio)
         self.server = HTTPServer(self.pool)
         self.add_server_routes()
@@ -172,6 +179,7 @@ class WifiManager:
             self.server.start(str(self.ip_address))
 
     def get_configuration_page(self, request):
+        """Returns the html configuration page."""
         configPage = (
             '''<!DOCTYPE html>
 <html>
@@ -373,12 +381,14 @@ class WifiManager:
         return HTTPResponse(body=configPage, content_type="text/html")
 
     def get_ssid(self):
+        """Get the current SSID that the device is connected to or the AP Name"""
         if self.status == "ACCESS_POINT":
             return self.ap_name
         if self.selected_wifi is not None and "ssid" in self.selected_wifi:
             return self.selected_wifi["ssid"]
 
     def connect_to_wifi_network(self, request):
+        """Get the current SSID that the device is connected to or the AP Name"""
         parameters = (
             request.raw_request.decode("utf-8").splitlines()[-1].split("&password=")
         )
@@ -394,6 +404,7 @@ class WifiManager:
         return HTTPResponse(body=f"{str(return_status)}")
 
     def add_server_routes(self):
+        """Add the server routes for the Wifi Manager"""
         self.add_server_route("/wifi_settings", "GET", self.get_configuration_page)
         self.add_server_route("/wifi_settings/mode", "GET", self.get_wifi_mode_response)
         self.add_server_route(
@@ -407,18 +418,22 @@ class WifiManager:
         )
 
     def add_server_route(self, path, method, func):
+        """Add a server route for a path, method (GET, POST etc.), and function"""
         if self.server is not None:
             self.server.routes[_HTTPRequest(path, method)] = func
 
     def get_wifi_networks_response(self, request):
+        """Wrapper function for get_wifi_networks"""
         networks = json.dumps(self.get_wifi_networks())
         return HTTPResponse(body=f"{str(networks)}")
 
     def get_wifi_mode_response(self, request):
+        """Wrapper function for get_wifi_mode"""
         mode = json.dumps({"mode": self.status})
         return HTTPResponse(body=f"{str(mode)}")
 
     def get_wifi_current_response(self, request):
+        """Wrapper function for get_wifi_current"""
         current_ssid = (
             self.selected_wifi["ssid"]
             if (self.selected_wifi is not None and "ssid" in self.selected_wifi)

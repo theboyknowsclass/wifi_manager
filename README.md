@@ -1,2 +1,2 @@
-# wifi_manager
-circuitpython wifi manager
+# Wifi Manager for Adafruit CircuitPython
+Wifi Manager for Adafruit CircuitPython
